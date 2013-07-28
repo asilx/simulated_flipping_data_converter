@@ -1,7 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>      
-#include <stdlib.h>     
+#include <stdlib.h> 
+#include <string>
+#include <sstream>     
 using namespace std;
 
 int main (int argc, char** argv)
@@ -12,14 +14,19 @@ int main (int argc, char** argv)
 		return -1;
 	}
 
-	ofstream dataset_writer(argv[1] + "/dataset.csv");
+	stringstream ss;
+	string argv1(argv[1]);
+	ofstream dataset_writer((char*)(argv1 + "/dataset.csv").c_str());
 
 	//positive samples
 	for(int i = 0; i < atoi(argv[2]); i++)
 	{
-		ifstream positive_sphere_data_reader(argv[1] + "/success_" + itoa(i) + "/sphere_poses.csv");
-		ifstream positive_spatula_data_reader(argv[1] + "/success_" + itoa(i) + "/spatula_head_poses.csv");
-		ofstream combined_data_writer(argv[1] + "/success_" + itoa(i) + "/combined_data.csv");
+		ss << i;
+		string istr = ss.str();
+
+		ifstream positive_sphere_data_reader((char*)(argv1 + "/success_" + istr + "/sphere_poses.csv").c_str());
+		ifstream positive_spatula_data_reader((char*)(argv1 + "/success_" + istr + "/spatula_head_poses.csv").c_str());
+		ofstream combined_data_writer((char*)(argv1 + "/success_" + istr + "/combined_data.csv").c_str());
 
 		double timestamp = -1;
 		bool isFirstThresholdPass = false;
@@ -32,13 +39,13 @@ int main (int argc, char** argv)
 		double prev_mean_sphere_y = -1;
 		double prev_mean_sphere_z = -1;
 
-		double mean_sphere_x = 0;
-		double mean_sphere_y = 0;
-		double mean_sphere_z = 0;
+		double mean_sphere_vx = 0;
+		double mean_sphere_vy = 0;
+		double mean_sphere_vz = 0;
 
-		double prev_mean_sphere_x = -1;
-		double prev_mean_sphere_y = -1;
-		double prev_mean_sphere_z = -1;
+		double prev_mean_sphere_vx = -1;
+		double prev_mean_sphere_vy = -1;
+		double prev_mean_sphere_vz = -1;
 		
 
 		double spatula_x = 0;
@@ -137,18 +144,18 @@ int main (int argc, char** argv)
 			}
 			else
 			{
-				mean_sphere_vx = mean_sphere_x - prev_sphere_x;
-				mean_sphere_vy = mean_sphere_y - prev_sphere_y;
-				mean_sphere_vz = mean_sphere_z - prev_sphere_z;
+				mean_sphere_vx = mean_sphere_x - prev_mean_sphere_x;
+				mean_sphere_vy = mean_sphere_y - prev_mean_sphere_y;
+				mean_sphere_vz = mean_sphere_z - prev_mean_sphere_z;
 
-				spatula_vx = spatula_x - prev_spatula_X;
+				spatula_vx = spatula_x - prev_spatula_x;
 				spatula_vy = spatula_y - prev_spatula_y;
 				spatula_vz = spatula_z - prev_spatula_z;
 			}
 
 			if(isFirstThresholdPass)
 			{
-				if(spatula_vz < atoi(argv[6])
+				if(spatula_vz < atoi(argv[6]))
 				{
 					combined_data_writer << timestamp << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
 						mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
@@ -190,9 +197,12 @@ int main (int argc, char** argv)
 	//negative samples
 	for(int i = 0; i < atoi(argv[3]); i++)
 	{
-		ifstream negative_sphere_data_reader(argv[1] + "/fail_" + itoa(i) + "/sphere_poses.csv");
-		ifstream negative_spatula_data_reader(argv[1] + "/fail_" + itoa(i) + "/spatula_head_poses.csv");
-		ofstream combined_data_writer(argv[1] + "/fail_" + itoa(i) + "/combined_data.csv");
+		ss << i;
+		string istr = ss.str();
+
+		ifstream negative_sphere_data_reader((char*)(argv1 + "/fail_" + istr + "/sphere_poses.csv").c_str());
+		ifstream negative_spatula_data_reader((char*)(argv1 + "/fail_" + istr + "/spatula_head_poses.csv").c_str());
+		ofstream combined_data_writer((char*)(argv1 + "/fail_" + istr + "/combined_data.csv").c_str());
 
 		double timestamp = -1;
 		bool isFirstThresholdPass = false;
@@ -205,13 +215,13 @@ int main (int argc, char** argv)
 		double prev_mean_sphere_y = -1;
 		double prev_mean_sphere_z = -1;
 
-		double mean_sphere_x = 0;
-		double mean_sphere_y = 0;
-		double mean_sphere_z = 0;
+		double mean_sphere_vx = 0;
+		double mean_sphere_vy = 0;
+		double mean_sphere_vz = 0;
 
-		double prev_mean_sphere_x = -1;
-		double prev_mean_sphere_y = -1;
-		double prev_mean_sphere_z = -1;
+		double prev_mean_sphere_vx = -1;
+		double prev_mean_sphere_vy = -1;
+		double prev_mean_sphere_vz = -1;
 		
 
 		double spatula_x = 0;
@@ -310,18 +320,18 @@ int main (int argc, char** argv)
 			}
 			else
 			{
-				mean_sphere_vx = mean_sphere_x - prev_sphere_x;
-				mean_sphere_vy = mean_sphere_y - prev_sphere_y;
-				mean_sphere_vz = mean_sphere_z - prev_sphere_z;
+				mean_sphere_vx = mean_sphere_x - prev_mean_sphere_x;
+				mean_sphere_vy = mean_sphere_y - prev_mean_sphere_y;
+				mean_sphere_vz = mean_sphere_z - prev_mean_sphere_z;
 
-				spatula_vx = spatula_x - prev_spatula_X;
+				spatula_vx = spatula_x - prev_spatula_x;
 				spatula_vy = spatula_y - prev_spatula_y;
 				spatula_vz = spatula_z - prev_spatula_z;
 			}
 
 			if(isFirstThresholdPass)
 			{
-				if(spatula_vz < atoi(argv[6])
+				if(spatula_vz < atoi(argv[6]))
 				{
 					combined_data_writer << timestamp << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
 						mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
