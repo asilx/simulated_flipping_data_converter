@@ -1,3 +1,37 @@
+/*
+ * main.cpp
+ * Copyright (c) 2013, Asil Kaan Bozcuoglu, Institute for Artifical Intelligence, Universitaet Bremen
+ * asil@cs.uni-bremen.de
+ *
+ * All rights reserved.
+ *
+ * Software License Agreement (BSD License)
+ *
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of Universitaet Bremen nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 #include <iostream>
 #include <fstream>
 #include <stdio.h>      
@@ -26,7 +60,7 @@ int main (int argc, char** argv)
 		string istr = ss.str();
 		ss.str("");
 
-		cout << (char*)(argv1 + "/success_" + istr + "/spatula_head_pose.csv").c_str() << endl;
+		
 
 		ifstream positive_sphere_data_reader((char*)(argv1 + "/success_" + istr + "/sphere_poses.csv").c_str());
 		ifstream positive_spatula_data_reader((char*)(argv1 + "/success_" + istr + "/spatula_head_pose.csv").c_str());
@@ -204,15 +238,10 @@ int main (int argc, char** argv)
 				{
 					if(spatula_vz < atof(argv[6]))
 					{
-						cout << timestamp << " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
-							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
-							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << endl;
-
 						combined_data_writer << timestamp << " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
 							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
 							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << endl;
+							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << "1" << endl;
 
 						dataset_writer << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
 							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
@@ -247,7 +276,7 @@ int main (int argc, char** argv)
 			data_counter++;	
 		}
 
-		dataset_writer << endl;
+		dataset_writer << "1" << endl;
 	}
 
 	//negative samples
@@ -257,9 +286,10 @@ int main (int argc, char** argv)
 		string istr = ss.str();
 		ss.str("");
 
-		ifstream negative_sphere_data_reader((char*)(argv1 + "/fail_push_off" + istr + "/sphere_poses.csv").c_str());
-		ifstream negative_spatula_data_reader((char*)(argv1 + "/fail_push_off" + istr + "/spatula_head_pose.csv").c_str());
-		ofstream combined_data_writer((char*)(argv1 + "/fail_push_off" + istr + "/combined_data.csv").c_str());
+
+		ifstream negative_sphere_data_reader((char*)(argv1 + "/fail_push_off_" + istr + "/sphere_poses.csv").c_str());
+		ifstream negative_spatula_data_reader((char*)(argv1 + "/fail_push_off_" + istr + "/spatula_head_pose.csv").c_str());
+		ofstream combined_data_writer((char*)(argv1 + "/fail_push_off_" + istr + "/combined_data.csv").c_str());
 
 		double timestamp = -1;
 		bool isFirstThresholdPass = false;
@@ -401,7 +431,7 @@ int main (int argc, char** argv)
 				negative_sphere_data_reader >> temp;
 				sphere_counter++;
 			}
-			
+
 			mean_sphere_x /= sphere_counter;
 			mean_sphere_y /= sphere_counter; 
 			mean_sphere_z /= sphere_counter;  
@@ -434,10 +464,16 @@ int main (int argc, char** argv)
 					
 					if(spatula_vz > atof(argv[8]))
 					{
+						cout << timestamp << " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
+							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
+							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
+							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << "0" << endl;
+
+
 						combined_data_writer << timestamp << " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
 							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
 							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << endl;
+							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << "0" << endl;
 
 						dataset_writer << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
 							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
@@ -472,7 +508,7 @@ int main (int argc, char** argv)
 			data_counter++;	
 		}
 
-		dataset_writer << endl;
+		dataset_writer << "0" << endl;
 	}
 
 	return 0;
