@@ -69,7 +69,10 @@ int main (int argc, char** argv)
 		double timestamp = -1;
 		bool isFirstThresholdPass = false;
 		bool isFirstThresholdHalt = false;
-		
+		bool isFirstDataWriting = false;
+
+		double first_timestamp_to_be_recorded = -1;
+
 		double mean_sphere_x = 0;
 		double mean_sphere_y = 0;
 		double mean_sphere_z = 0;
@@ -238,7 +241,14 @@ int main (int argc, char** argv)
 				{
 					if(spatula_vz < atof(argv[6]))
 					{
-						combined_data_writer << timestamp << " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
+						if(isFirstDataWriting)
+						{
+							first_timestamp_to_be_recorded = timestamp;
+							isFirstDataWriting = true;
+						}
+
+						combined_data_writer << timestamp - first_timestamp_to_be_recorded 
+							<< " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
 							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
 							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
 							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
@@ -252,8 +262,11 @@ int main (int argc, char** argv)
 					}				
 					else break;
 				}
-				else if(spatula_vz < atof(argv[5]))		
+				else if(spatula_vz < atof(argv[5]))
+				{		
 					isFirstThresholdHalt = true;
+					isFirstDataWriting = true;
+				}
 		
 			}
 			else if(spatula_vz > atof(argv[5]))		
@@ -296,6 +309,9 @@ int main (int argc, char** argv)
 		double timestamp = -1;
 		bool isFirstThresholdPass = false;
 		bool isFirstThresholdHalt = false;
+		bool isFirstDataWriting = false;
+
+		double first_timestamp_to_be_recorded = -1;
 		
 		double mean_sphere_x = 0;
 		double mean_sphere_y = 0;
@@ -466,7 +482,14 @@ int main (int argc, char** argv)
 					
 					if(spatula_vz > atof(argv[8]))
 					{
-						combined_data_writer << timestamp << " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
+						if(isFirstDataWriting)
+						{
+							first_timestamp_to_be_recorded = timestamp;
+							isFirstDataWriting = true;
+						}
+
+						combined_data_writer << timestamp - first_timestamp_to_be_recorded 
+							<< " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
 							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
 							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
 							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
@@ -480,8 +503,11 @@ int main (int argc, char** argv)
 					}				
 					else break;
 				}
-				else if(spatula_vz < atof(argv[7]))		
+				else if(spatula_vz < atof(argv[7]))
+				{		
 					isFirstThresholdHalt = true;
+					isFirstDataWriting = true;
+				}
 		
 			}
 			else if(spatula_vz > atof(argv[7]))		
