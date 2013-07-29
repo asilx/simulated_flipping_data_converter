@@ -241,12 +241,14 @@ int main (int argc, char** argv)
 						combined_data_writer << timestamp << " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
 							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
 							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << "1" << endl;
+							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
+							<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " 1" << endl;
 
 						dataset_writer << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
 							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
 							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-							spatula_vx << " " << spatula_vy << " " << spatula_vz << " ";
+							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
+							<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " ";
 					}				
 					else break;
 				}
@@ -464,21 +466,17 @@ int main (int argc, char** argv)
 					
 					if(spatula_vz > atof(argv[8]))
 					{
-						cout << timestamp << " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
-							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
-							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << "0" << endl;
-
-
 						combined_data_writer << timestamp << " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
 							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
 							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << "0" << endl;
+							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
+							<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " 0" << endl;
 
 						dataset_writer << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
 							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
 							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-							spatula_vx << " " << spatula_vy << " " << spatula_vz << " ";
+							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
+							<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " ";
 					}				
 					else break;
 				}
