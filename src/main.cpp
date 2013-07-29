@@ -35,7 +35,8 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>      
-#include <stdlib.h> 
+#include <stdlib.h>
+#include <math.h> 
 #include <string>
 #include <sstream>     
 using namespace std;
@@ -65,6 +66,8 @@ int main (int argc, char** argv)
 		ifstream positive_sphere_data_reader((char*)(argv1 + "/success_" + istr + "/sphere_poses.csv").c_str());
 		ifstream positive_spatula_data_reader((char*)(argv1 + "/success_" + istr + "/spatula_head_pose.csv").c_str());
 		ofstream combined_data_writer((char*)(argv1 + "/success_" + istr + "/combined_data.csv").c_str());
+		
+		double distance = -1;
 
 		double timestamp = -1;
 		bool isFirstThresholdPass = false;
@@ -212,6 +215,8 @@ int main (int argc, char** argv)
 			mean_sphere_x = mean_sphere_x / sphere_counter;
 			mean_sphere_y = mean_sphere_y / sphere_counter; 
 			mean_sphere_z = mean_sphere_z / sphere_counter;  
+				
+			distance = pow(pow((mean_sphere_x - spatula_x), 2) + pow((mean_sphere_y - spatula_y), 2) + pow((mean_sphere_z - spatula_z), 2), 1/2);	
 
 			if(prev_spatula_x == -1)
 			{
@@ -234,8 +239,47 @@ int main (int argc, char** argv)
 				spatula_vz = spatula_z - prev_spatula_z;
 			}
 
-			
 			if(isFirstThresholdPass)
+			{
+				//if(isFirstThresholdHalt)
+				//{
+				if(spatula_vz < atof(argv[6]))
+				{
+					if(isFirstDataWriting)
+					{
+						first_timestamp_to_be_recorded = timestamp;
+						isFirstDataWriting = false;
+					}
+
+					combined_data_writer << timestamp - first_timestamp_to_be_recorded 
+						<< " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
+						mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
+						spatula_x << " " << spatula_y << " " << spatula_z << " " << 
+						spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
+						<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " 1" << endl;
+
+					dataset_writer << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
+						mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
+						spatula_x << " " << spatula_y << " " << spatula_z << " " << 
+						spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
+						<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " ";
+				}				
+				else break;
+				/*}
+				else if(spatula_vz < atof(argv[5]))
+				{		
+					isFirstThresholdHalt = true;
+					isFirstDataWriting = true;
+				}*/
+		
+			}
+			else if(distance <= atof(argv[5]))
+			{		
+				isFirstThresholdPass = true;			
+				isFirstDataWriting = true;
+			}
+
+			/*if(isFirstThresholdPass)
 			{
 				if(isFirstThresholdHalt)
 				{
@@ -244,7 +288,7 @@ int main (int argc, char** argv)
 						if(isFirstDataWriting)
 						{
 							first_timestamp_to_be_recorded = timestamp;
-							isFirstDataWriting = true;
+							isFirstDataWriting = false;
 						}
 
 						combined_data_writer << timestamp - first_timestamp_to_be_recorded 
@@ -270,7 +314,7 @@ int main (int argc, char** argv)
 		
 			}
 			else if(spatula_vz > atof(argv[5]))		
-				isFirstThresholdPass = true;
+				isFirstThresholdPass = true;*/
 
 			prev_spatula_x = spatula_x;
 			prev_spatula_y = spatula_y;
@@ -305,6 +349,8 @@ int main (int argc, char** argv)
 		ifstream negative_sphere_data_reader((char*)(argv1 + "/fail_push_off_" + istr + "/sphere_poses.csv").c_str());
 		ifstream negative_spatula_data_reader((char*)(argv1 + "/fail_push_off_" + istr + "/spatula_head_pose.csv").c_str());
 		ofstream combined_data_writer((char*)(argv1 + "/fail_push_off_" + istr + "/combined_data.csv").c_str());
+
+		double distance = -1;
 
 		double timestamp = -1;
 		bool isFirstThresholdPass = false;
@@ -452,7 +498,9 @@ int main (int argc, char** argv)
 
 			mean_sphere_x /= sphere_counter;
 			mean_sphere_y /= sphere_counter; 
-			mean_sphere_z /= sphere_counter;  
+			mean_sphere_z /= sphere_counter; 
+
+			distance = pow(pow((mean_sphere_x - spatula_x), 2) + pow((mean_sphere_y - spatula_y), 2) + pow((mean_sphere_z - spatula_z), 2), 1/2); 
 
 			if(prev_spatula_x == -1)
 			{
@@ -477,6 +525,46 @@ int main (int argc, char** argv)
 
 			if(isFirstThresholdPass)
 			{
+				/*if(isFirstThresholdHalt)
+				{*/	
+				if(spatula_vz > atof(argv[8]))
+				{
+					if(isFirstDataWriting)
+					{
+						first_timestamp_to_be_recorded = timestamp;
+						isFirstDataWriting = false;
+					}
+
+					combined_data_writer << timestamp - first_timestamp_to_be_recorded 
+						<< " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
+						mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
+						spatula_x << " " << spatula_y << " " << spatula_z << " " << 
+						spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
+						<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " 0" << endl;
+
+					dataset_writer << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
+						mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
+						spatula_x << " " << spatula_y << " " << spatula_z << " " << 
+						spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
+						<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " ";
+				}				
+				else break;
+				/*}
+				else if(spatula_vz < atof(argv[7]))
+				{		
+					isFirstThresholdHalt = true;
+					isFirstDataWriting = true;
+				}*/
+		
+			}
+			else if(distance < atof(argv[7]))		
+			{		
+				isFirstThresholdPass = true;			
+				isFirstDataWriting = true;
+			}
+
+			/*if(isFirstThresholdPass)
+			{
 				if(isFirstThresholdHalt)
 				{
 					
@@ -485,7 +573,7 @@ int main (int argc, char** argv)
 						if(isFirstDataWriting)
 						{
 							first_timestamp_to_be_recorded = timestamp;
-							isFirstDataWriting = true;
+							isFirstDataWriting = false;
 						}
 
 						combined_data_writer << timestamp - first_timestamp_to_be_recorded 
@@ -511,7 +599,7 @@ int main (int argc, char** argv)
 		
 			}
 			else if(spatula_vz > atof(argv[7]))		
-				isFirstThresholdPass = true;
+				isFirstThresholdPass = true;*/
 
 			prev_spatula_x = spatula_x;
 			prev_spatula_y = spatula_y;
