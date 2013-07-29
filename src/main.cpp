@@ -10,26 +10,31 @@ int main (int argc, char** argv)
 {
 	if (argc < 9)
 	{
-		cout << "Usage: converter [input_folder] [number_of_positive_samples] [number_of_negative_samples] [output_file] [threshold11] [threshold12] [threshold21] [threshold22]" << endl;
+		cout << "Usage: converter [input_folder] [number_of_positive_samples] [number_of_negative_samples] [output_folder] [threshold11] [threshold12] [threshold21] [threshold22]" << endl;
 		return -1;
 	}
 
 	stringstream ss;
 	string argv1(argv[1]);
-	ofstream dataset_writer((char*)(argv1 + "/dataset.csv").c_str());
+	string argv4(argv[4]);
+	ofstream dataset_writer((char*)(argv4 + "/dataset.csv").c_str());
 
 	//positive samples
-	for(int i = 0; i < atoi(argv[2]); i++)
+	for(int i = 0; i < atof(argv[2]); i++)
 	{
-		ss << i;
+		ss << (i + 1);
 		string istr = ss.str();
+		ss.str("");
+
+		cout << (char*)(argv1 + "/success_" + istr + "/spatula_head_pose.csv").c_str() << endl;
 
 		ifstream positive_sphere_data_reader((char*)(argv1 + "/success_" + istr + "/sphere_poses.csv").c_str());
-		ifstream positive_spatula_data_reader((char*)(argv1 + "/success_" + istr + "/spatula_head_poses.csv").c_str());
+		ifstream positive_spatula_data_reader((char*)(argv1 + "/success_" + istr + "/spatula_head_pose.csv").c_str());
 		ofstream combined_data_writer((char*)(argv1 + "/success_" + istr + "/combined_data.csv").c_str());
 
 		double timestamp = -1;
 		bool isFirstThresholdPass = false;
+		bool isFirstThresholdHalt = false;
 		
 		double mean_sphere_x = 0;
 		double mean_sphere_y = 0;
@@ -69,6 +74,16 @@ int main (int argc, char** argv)
 		double data_counter = 0;
 		double temp = 0;
 
+		double first_timestamp = -1;
+
+		positive_spatula_data_reader >> temp;
+		positive_spatula_data_reader >> temp;
+		positive_spatula_data_reader >> temp;
+		positive_spatula_data_reader >> temp;
+		positive_spatula_data_reader >> temp;
+		positive_spatula_data_reader >> temp;
+		positive_spatula_data_reader >> temp;	
+
 		while(positive_spatula_data_reader >> timestamp)
 		{
 			sphere_counter = 0;
@@ -84,19 +99,43 @@ int main (int argc, char** argv)
 			bool isAlreadyAllignedTimestamps = false;
 			if(data_counter == 0)
 			{
-				positive_sphere_data_reader >> temp;
+				positive_sphere_data_reader >> temp;	
 				if(temp == timestamp) 
 				{
 					isAlreadyAllignedTimestamps = true;
-					break;
 				}
-				positive_sphere_data_reader >> temp;
-				positive_sphere_data_reader >> temp;
-				positive_sphere_data_reader >> temp;
-				positive_sphere_data_reader >> temp;
-				positive_sphere_data_reader >> temp;
-				positive_sphere_data_reader >> temp;
+				else
+				{
+					positive_sphere_data_reader >> temp;
+					positive_sphere_data_reader >> temp;
+					positive_sphere_data_reader >> temp;
+					positive_sphere_data_reader >> temp;
+					positive_sphere_data_reader >> temp;
+					positive_sphere_data_reader >> temp;
+				}
 		
+			}
+			else if(first_timestamp == timestamp)
+			{
+				positive_sphere_data_reader >> temp;
+				mean_sphere_x += temp;
+				positive_sphere_data_reader >> temp;
+				mean_sphere_y += temp;
+				positive_sphere_data_reader >> temp;
+				mean_sphere_z += temp;
+				positive_sphere_data_reader >> temp;
+				positive_sphere_data_reader >> temp;
+				positive_sphere_data_reader >> temp;
+				sphere_counter++;
+			}
+			else
+			{
+				positive_sphere_data_reader >> temp;
+				positive_sphere_data_reader >> temp;
+				positive_sphere_data_reader >> temp;
+				positive_sphere_data_reader >> temp;
+				positive_sphere_data_reader >> temp;
+				positive_sphere_data_reader >> temp;
 			}
 		
 			if(isAlreadyAllignedTimestamps)
@@ -106,31 +145,36 @@ int main (int argc, char** argv)
 				positive_sphere_data_reader >> temp;
 				mean_sphere_y += temp;
 				positive_sphere_data_reader >> temp;
-				mean_sphere_x += temp;
+				mean_sphere_z += temp;
 				positive_sphere_data_reader >> temp;
 				positive_sphere_data_reader >> temp;
 				positive_sphere_data_reader >> temp;
+
 				sphere_counter++;
 			}
 
 			while(positive_sphere_data_reader >> temp)
 			{
-				if(temp != timestamp) break;
+				if(temp != timestamp) 
+				{
+					first_timestamp = temp;
+					break;
+				}
 				positive_sphere_data_reader >> temp;
 				mean_sphere_x += temp;
 				positive_sphere_data_reader >> temp;
 				mean_sphere_y += temp;
 				positive_sphere_data_reader >> temp;
-				mean_sphere_x += temp;
+				mean_sphere_z += temp;
 				positive_sphere_data_reader >> temp;
 				positive_sphere_data_reader >> temp;
 				positive_sphere_data_reader >> temp;
 				sphere_counter++;
 			}
 			
-			mean_sphere_x /= sphere_counter;
-			mean_sphere_y /= sphere_counter; 
-			mean_sphere_z /= sphere_counter;  
+			mean_sphere_x = mean_sphere_x / sphere_counter;
+			mean_sphere_y = mean_sphere_y / sphere_counter; 
+			mean_sphere_z = mean_sphere_z / sphere_counter;  
 
 			if(prev_spatula_x == -1)
 			{
@@ -153,23 +197,35 @@ int main (int argc, char** argv)
 				spatula_vz = spatula_z - prev_spatula_z;
 			}
 
+			
 			if(isFirstThresholdPass)
 			{
-				if(spatula_vz < atoi(argv[6]))
+				if(isFirstThresholdHalt)
 				{
-					combined_data_writer << timestamp << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
-						mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
-						spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-						spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << endl;
+					if(spatula_vz < atof(argv[6]))
+					{
+						cout << timestamp << " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
+							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
+							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
+							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << endl;
 
-					dataset_writer << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
-						mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
-						spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-						spatula_vx << " " << spatula_vy << " " << spatula_vz << " ";
-				}				
-				else break;		
+						combined_data_writer << timestamp << " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
+							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
+							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
+							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << endl;
+
+						dataset_writer << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
+							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
+							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
+							spatula_vx << " " << spatula_vy << " " << spatula_vz << " ";
+					}				
+					else break;
+				}
+				else if(spatula_vz < atof(argv[5]))		
+					isFirstThresholdHalt = true;
+		
 			}
-			else if(spatula_vz > atoi(argv[5]))		
+			else if(spatula_vz > atof(argv[5]))		
 				isFirstThresholdPass = true;
 
 			prev_spatula_x = spatula_x;
@@ -195,17 +251,19 @@ int main (int argc, char** argv)
 	}
 
 	//negative samples
-	for(int i = 0; i < atoi(argv[3]); i++)
+	for(int i = 0; i < atof(argv[3]); i++)
 	{
-		ss << i;
+		ss << (i + 1);
 		string istr = ss.str();
+		ss.str("");
 
-		ifstream negative_sphere_data_reader((char*)(argv1 + "/fail_" + istr + "/sphere_poses.csv").c_str());
-		ifstream negative_spatula_data_reader((char*)(argv1 + "/fail_" + istr + "/spatula_head_poses.csv").c_str());
-		ofstream combined_data_writer((char*)(argv1 + "/fail_" + istr + "/combined_data.csv").c_str());
+		ifstream negative_sphere_data_reader((char*)(argv1 + "/fail_push_off" + istr + "/sphere_poses.csv").c_str());
+		ifstream negative_spatula_data_reader((char*)(argv1 + "/fail_push_off" + istr + "/spatula_head_pose.csv").c_str());
+		ofstream combined_data_writer((char*)(argv1 + "/fail_push_off" + istr + "/combined_data.csv").c_str());
 
 		double timestamp = -1;
 		bool isFirstThresholdPass = false;
+		bool isFirstThresholdHalt = false;
 		
 		double mean_sphere_x = 0;
 		double mean_sphere_y = 0;
@@ -245,6 +303,17 @@ int main (int argc, char** argv)
 		double data_counter = 0;
 		double temp = 0;
 
+		double first_timestamp = -1;
+
+		negative_spatula_data_reader >> temp;
+		negative_spatula_data_reader >> temp;
+		negative_spatula_data_reader >> temp;
+		negative_spatula_data_reader >> temp;
+		negative_spatula_data_reader >> temp;
+		negative_spatula_data_reader >> temp;
+		negative_spatula_data_reader >> temp;
+			
+
 		while(negative_spatula_data_reader >> timestamp)
 		{
 			sphere_counter = 0;
@@ -264,16 +333,41 @@ int main (int argc, char** argv)
 				if(temp == timestamp) 
 				{
 					isAlreadyAllignedTimestamps = true;
-					break;
 				}
-				negative_sphere_data_reader >> temp;
-				negative_sphere_data_reader >> temp;
-				negative_sphere_data_reader >> temp;
-				negative_sphere_data_reader >> temp;
-				negative_sphere_data_reader >> temp;
-				negative_sphere_data_reader >> temp;
+				else
+				{
+					negative_sphere_data_reader >> temp;
+					negative_sphere_data_reader >> temp;
+					negative_sphere_data_reader >> temp;
+					negative_sphere_data_reader >> temp;
+					negative_sphere_data_reader >> temp;
+					negative_sphere_data_reader >> temp;
+				}
 		
 			}
+			else if(first_timestamp == timestamp)
+			{
+				negative_sphere_data_reader >> temp;
+				mean_sphere_x += temp;
+				negative_sphere_data_reader >> temp;
+				mean_sphere_y += temp;
+				negative_sphere_data_reader >> temp;
+				mean_sphere_z += temp;
+				negative_sphere_data_reader >> temp;
+				negative_sphere_data_reader >> temp;
+				negative_sphere_data_reader >> temp;
+				sphere_counter++;
+			}
+			else
+			{
+				negative_sphere_data_reader >> temp;
+				negative_sphere_data_reader >> temp;
+				negative_sphere_data_reader >> temp;
+				negative_sphere_data_reader >> temp;
+				negative_sphere_data_reader >> temp;
+				negative_sphere_data_reader >> temp;
+			}
+		
 		
 			if(isAlreadyAllignedTimestamps)
 			{
@@ -282,7 +376,7 @@ int main (int argc, char** argv)
 				negative_sphere_data_reader >> temp;
 				mean_sphere_y += temp;
 				negative_sphere_data_reader >> temp;
-				mean_sphere_x += temp;
+				mean_sphere_z += temp;
 				negative_sphere_data_reader >> temp;
 				negative_sphere_data_reader >> temp;
 				negative_sphere_data_reader >> temp;
@@ -291,13 +385,17 @@ int main (int argc, char** argv)
 
 			while(negative_sphere_data_reader >> temp)
 			{
-				if(temp != timestamp) break;
+				if(temp != timestamp) 
+				{
+					first_timestamp = temp;
+					break;
+				}
 				negative_sphere_data_reader >> temp;
 				mean_sphere_x += temp;
 				negative_sphere_data_reader >> temp;
 				mean_sphere_y += temp;
 				negative_sphere_data_reader >> temp;
-				mean_sphere_x += temp;
+				mean_sphere_z += temp;
 				negative_sphere_data_reader >> temp;
 				negative_sphere_data_reader >> temp;
 				negative_sphere_data_reader >> temp;
@@ -331,21 +429,28 @@ int main (int argc, char** argv)
 
 			if(isFirstThresholdPass)
 			{
-				if(spatula_vz < atoi(argv[6]))
+				if(isFirstThresholdHalt)
 				{
-					combined_data_writer << timestamp << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
-						mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
-						spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-						spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << endl;
+					
+					if(spatula_vz > atof(argv[8]))
+					{
+						combined_data_writer << timestamp << " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
+							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
+							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
+							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << endl;
 
-					dataset_writer << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
-						mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
-						spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-						spatula_vx << " " << spatula_vy << " " << spatula_vz << " ";
-				}				
-				else break;		
+						dataset_writer << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
+							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
+							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
+							spatula_vx << " " << spatula_vy << " " << spatula_vz << " ";
+					}				
+					else break;
+				}
+				else if(spatula_vz < atof(argv[7]))		
+					isFirstThresholdHalt = true;
+		
 			}
-			else if(spatula_vz > atoi(argv[5]))		
+			else if(spatula_vz > atof(argv[7]))		
 				isFirstThresholdPass = true;
 
 			prev_spatula_x = spatula_x;
