@@ -241,9 +241,7 @@ int main (int argc, char** argv)
 
 			if(isFirstThresholdPass)
 			{
-				//if(isFirstThresholdHalt)
-				//{
-				if(spatula_vz < atof(argv[6]))
+				if(mean_sphere_vx > atof(argv[6]) || mean_sphere_vy > atof(argv[6]) || mean_sphere_vz > atof(argv[6]))
 				{
 					if(isFirstDataWriting)
 					{
@@ -265,12 +263,6 @@ int main (int argc, char** argv)
 						<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " ";
 				}				
 				else break;
-				/*}
-				else if(spatula_vz < atof(argv[5]))
-				{		
-					isFirstThresholdHalt = true;
-					isFirstDataWriting = true;
-				}*/
 		
 			}
 			else if(distance <= atof(argv[5]))
@@ -525,9 +517,7 @@ int main (int argc, char** argv)
 
 			if(isFirstThresholdPass)
 			{
-				/*if(isFirstThresholdHalt)
-				{*/	
-				if(spatula_vz > atof(argv[8]))
+				if(mean_sphere_vx > atof(argv[8]) || mean_sphere_vy > atof(argv[8]) || mean_sphere_vz > atof(argv[8]))
 				{
 					if(isFirstDataWriting)
 					{
@@ -549,18 +539,7 @@ int main (int argc, char** argv)
 						<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " ";
 				}				
 				else break;
-				/*}
-				else if(spatula_vz < atof(argv[7]))
-				{		
-					isFirstThresholdHalt = true;
-					isFirstDataWriting = true;
-				}*/
 		
-			}
-			else if(distance < atof(argv[7]))		
-			{		
-				isFirstThresholdPass = true;			
-				isFirstDataWriting = true;
 			}
 
 			/*if(isFirstThresholdPass)
