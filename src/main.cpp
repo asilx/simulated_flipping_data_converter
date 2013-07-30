@@ -329,7 +329,7 @@ int main (int argc, char** argv)
 			data_counter++;	
 		}
 
-		dataset_writer << "1" << endl;
+		dataset_writer << ",1" << endl;
 	}
 
 	//negative samples
@@ -606,7 +606,7 @@ int main (int argc, char** argv)
 			data_counter++;	
 		}
 
-		dataset_writer << "0" << endl;
+		dataset_writer << ",0" << endl;
 	}
 
 	return 0;
