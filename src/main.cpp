@@ -241,7 +241,7 @@ int main (int argc, char** argv)
 
 			if(isFirstThresholdPass)
 			{
-				if(mean_sphere_vx > atof(argv[6]) || mean_sphere_vy > atof(argv[6]) || mean_sphere_vz > atof(argv[6]))
+				if(spatula_vz < atof(argv[6]))
 				{
 					if(isFirstDataWriting)
 					{
@@ -265,8 +265,8 @@ int main (int argc, char** argv)
 				else break;
 		
 			}
-			else if(distance <= atof(argv[5]))
-			{		
+			else if(fabs(mean_sphere_vx) > atof(argv[5]) || fabs(mean_sphere_vy) > atof(argv[5]) || fabs(mean_sphere_vz) > atof(argv[5]))
+			{	
 				isFirstThresholdPass = true;			
 				isFirstDataWriting = true;
 			}
@@ -517,7 +517,7 @@ int main (int argc, char** argv)
 
 			if(isFirstThresholdPass)
 			{
-				if(mean_sphere_vx > atof(argv[8]) || mean_sphere_vy > atof(argv[8]) || mean_sphere_vz > atof(argv[8]))
+				if(mean_sphere_vz > atof(argv[8]))
 				{
 					if(isFirstDataWriting)
 					{
@@ -540,6 +540,11 @@ int main (int argc, char** argv)
 				}				
 				else break;
 		
+			}
+			else if(fabs(mean_sphere_vx) > atof(argv[5]) || fabs(mean_sphere_vy) > atof(argv[5]) || fabs(mean_sphere_vz) > atof(argv[5]))
+			{		
+				isFirstThresholdPass = true;			
+				isFirstDataWriting = true;
 			}
 
 			/*if(isFirstThresholdPass)
