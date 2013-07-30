@@ -271,7 +271,7 @@ int main (int argc, char** argv)
 				isFirstDataWriting = true;
 			}*/
 
-			if(i != 4) cout << spatula_vz << endl;
+			//if(i != 4) cout << spatula_vz << endl;
 
 			if(isFirstThresholdPass)
 			{
@@ -296,7 +296,7 @@ int main (int argc, char** argv)
 							mean_sphere_vx << "," << mean_sphere_vy << "," << mean_sphere_vz << "," <<
 							spatula_x << "," << spatula_y << "," << spatula_z << "," << 
 							spatula_vx << "," << spatula_vy << "," << spatula_vz << "," << spatula_vx - mean_sphere_vx
-							<< "," << spatula_vy - mean_sphere_vy << "," << spatula_vz - mean_sphere_vz << "";
+							<< "," << spatula_vy - mean_sphere_vy << "," << spatula_vz - mean_sphere_vz << ",";
 					}				
 					else break;
 				}
@@ -329,7 +329,7 @@ int main (int argc, char** argv)
 			data_counter++;	
 		}
 
-		dataset_writer << ",1" << endl;
+		dataset_writer << "1" << endl;
 	}
 
 	//negative samples
@@ -573,7 +573,7 @@ int main (int argc, char** argv)
 							mean_sphere_vx << "," << mean_sphere_vy << "," << mean_sphere_vz << "," <<
 							spatula_x << "," << spatula_y << "," << spatula_z << "," << 
 							spatula_vx << "," << spatula_vy << "," << spatula_vz << "," << spatula_vx - mean_sphere_vx
-							<< "," << spatula_vy - mean_sphere_vy << "," << spatula_vz - mean_sphere_vz << "";
+							<< "," << spatula_vy - mean_sphere_vy << "," << spatula_vz - mean_sphere_vz << ",";
 					}				
 					else break;
 				}
@@ -606,7 +606,7 @@ int main (int argc, char** argv)
 			data_counter++;	
 		}
 
-		dataset_writer << ",0" << endl;
+		dataset_writer << "0" << endl;
 	}
 
 	return 0;
