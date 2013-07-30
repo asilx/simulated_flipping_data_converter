@@ -53,7 +53,7 @@ int main (int argc, char** argv)
 	string argv1(argv[1]);
 	string argv4(argv[4]);
 	ofstream dataset_writer((char*)(argv4 + "/dataset.csv").c_str());
-
+	int min_count = -1;
 	//positive samples
 	for(int i = 0; i < atof(argv[2]); i++)
 	{
@@ -239,7 +239,7 @@ int main (int argc, char** argv)
 				spatula_vz = spatula_z - prev_spatula_z;
 			}
 
-			if(isFirstThresholdPass)
+			/*if(isFirstThresholdPass)
 			{
 				if(spatula_vz < atof(argv[6]))
 				{
@@ -250,17 +250,17 @@ int main (int argc, char** argv)
 					}
 
 					combined_data_writer << timestamp - first_timestamp_to_be_recorded 
-						<< " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
-						mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
-						spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-						spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
-						<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " 1" << endl;
+						<< "," << mean_sphere_x << "," << mean_sphere_y << "," << mean_sphere_z << "," <<
+						mean_sphere_vx << "," << mean_sphere_vy << "," << mean_sphere_vz << "," <<
+						spatula_x << "," << spatula_y << "," << spatula_z << "," << 
+						spatula_vx << "," << spatula_vy << "," << spatula_vz << "," << spatula_vx - mean_sphere_vx
+						<< "," << spatula_vy - mean_sphere_vy << "," << spatula_vz - mean_sphere_vz << " 1" << endl;
 
-					dataset_writer << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
-						mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
-						spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-						spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
-						<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " ";
+					dataset_writer << mean_sphere_x << "," << mean_sphere_y << "," << mean_sphere_z << "," <<
+						mean_sphere_vx << "," << mean_sphere_vy << "," << mean_sphere_vz << "," <<
+						spatula_x << "," << spatula_y << "," << spatula_z << "," << 
+						spatula_vx << "," << spatula_vy << "," << spatula_vz << "," << spatula_vx - mean_sphere_vx
+						<< "," << spatula_vy - mean_sphere_vy << "," << spatula_vz - mean_sphere_vz << ",";
 				}				
 				else break;
 		
@@ -269,9 +269,11 @@ int main (int argc, char** argv)
 			{	
 				isFirstThresholdPass = true;			
 				isFirstDataWriting = true;
-			}
+			}*/
 
-			/*if(isFirstThresholdPass)
+			if(i != 4) cout << spatula_vz << endl;
+
+			if(isFirstThresholdPass)
 			{
 				if(isFirstThresholdHalt)
 				{
@@ -284,21 +286,21 @@ int main (int argc, char** argv)
 						}
 
 						combined_data_writer << timestamp - first_timestamp_to_be_recorded 
-							<< " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
-							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
-							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
-							<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " 1" << endl;
+							<< "," << mean_sphere_x << "," << mean_sphere_y << "," << mean_sphere_z << "," <<
+							mean_sphere_vx << "," << mean_sphere_vy << "," << mean_sphere_vz << "," <<
+							spatula_x << "," << spatula_y << "," << spatula_z << "," << 
+							spatula_vx << "," << spatula_vy << "," << spatula_vz << "," << spatula_vx - mean_sphere_vx
+							<< "," << spatula_vy - mean_sphere_vy << "," << spatula_vz - mean_sphere_vz << ",1" << endl;
 
-						dataset_writer << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
-							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
-							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
-							<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " ";
+						dataset_writer << mean_sphere_x << "," << mean_sphere_y << "," << mean_sphere_z << "," <<
+							mean_sphere_vx << "," << mean_sphere_vy << "," << mean_sphere_vz << "," <<
+							spatula_x << "," << spatula_y << "," << spatula_z << "," << 
+							spatula_vx << "," << spatula_vy << "," << spatula_vz << "," << spatula_vx - mean_sphere_vx
+							<< "," << spatula_vy - mean_sphere_vy << "," << spatula_vz - mean_sphere_vz << "";
 					}				
 					else break;
 				}
-				else if(spatula_vz < atof(argv[5]))
+				else if(spatula_vz < atof(argv[5]) && (fabs(mean_sphere_vx) > 0.0004 || fabs(mean_sphere_vy) > 0.0004 || fabs(mean_sphere_vz) > 0.0004))
 				{		
 					isFirstThresholdHalt = true;
 					isFirstDataWriting = true;
@@ -306,7 +308,7 @@ int main (int argc, char** argv)
 		
 			}
 			else if(spatula_vz > atof(argv[5]))		
-				isFirstThresholdPass = true;*/
+				isFirstThresholdPass = true;
 
 			prev_spatula_x = spatula_x;
 			prev_spatula_y = spatula_y;
@@ -515,7 +517,7 @@ int main (int argc, char** argv)
 				spatula_vz = spatula_z - prev_spatula_z;
 			}
 
-			if(isFirstThresholdPass)
+			/*if(isFirstThresholdPass)
 			{
 				if(mean_sphere_vz > atof(argv[8]))
 				{
@@ -526,17 +528,17 @@ int main (int argc, char** argv)
 					}
 
 					combined_data_writer << timestamp - first_timestamp_to_be_recorded 
-						<< " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
-						mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
-						spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-						spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
-						<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " 0" << endl;
+						<< "," << mean_sphere_x << "," << mean_sphere_y << "," << mean_sphere_z << "," <<
+						mean_sphere_vx << "," << mean_sphere_vy << "," << mean_sphere_vz << "," <<
+						spatula_x << "," << spatula_y << "," << spatula_z << "," << 
+						spatula_vx << "," << spatula_vy << "," << spatula_vz << "," << spatula_vx - mean_sphere_vx
+						<< "," << spatula_vy - mean_sphere_vy << "," << spatula_vz - mean_sphere_vz << " 0" << endl;
 
-					dataset_writer << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
-						mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
-						spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-						spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
-						<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " ";
+					dataset_writer << mean_sphere_x << "," << mean_sphere_y << "," << mean_sphere_z << "," <<
+						mean_sphere_vx << "," << mean_sphere_vy << "," << mean_sphere_vz << "," <<
+						spatula_x << "," << spatula_y << "," << spatula_z << "," << 
+						spatula_vx << "," << spatula_vy << "," << spatula_vz << "," << spatula_vx - mean_sphere_vx
+						<< "," << spatula_vy - mean_sphere_vy << "," << spatula_vz - mean_sphere_vz << ",";
 				}				
 				else break;
 		
@@ -545,9 +547,9 @@ int main (int argc, char** argv)
 			{		
 				isFirstThresholdPass = true;			
 				isFirstDataWriting = true;
-			}
+			}*/
 
-			/*if(isFirstThresholdPass)
+			if(isFirstThresholdPass)
 			{
 				if(isFirstThresholdHalt)
 				{
@@ -561,21 +563,21 @@ int main (int argc, char** argv)
 						}
 
 						combined_data_writer << timestamp - first_timestamp_to_be_recorded 
-							<< " " << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
-							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
-							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
-							<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " 0" << endl;
+							<< "," << mean_sphere_x << "," << mean_sphere_y << "," << mean_sphere_z << "," <<
+							mean_sphere_vx << "," << mean_sphere_vy << "," << mean_sphere_vz << "," <<
+							spatula_x << "," << spatula_y << "," << spatula_z << "," << 
+							spatula_vx << "," << spatula_vy << "," << spatula_vz << "," << spatula_vx - mean_sphere_vx
+							<< "," << spatula_vy - mean_sphere_vy << "," << spatula_vz - mean_sphere_vz << ",0" << endl;
 
-						dataset_writer << mean_sphere_x << " " << mean_sphere_y << " " << mean_sphere_z << " " <<
-							mean_sphere_vx << " " << mean_sphere_vy << " " << mean_sphere_vz << " " <<
-							spatula_x << " " << spatula_y << " " << spatula_z << " " << 
-							spatula_vx << " " << spatula_vy << " " << spatula_vz << " " << spatula_vx - mean_sphere_vx
-							<< " " << spatula_vy - mean_sphere_vy << " " << spatula_vz - mean_sphere_vz << " ";
+						dataset_writer << mean_sphere_x << "," << mean_sphere_y << "," << mean_sphere_z << "," <<
+							mean_sphere_vx << "," << mean_sphere_vy << "," << mean_sphere_vz << "," <<
+							spatula_x << "," << spatula_y << "," << spatula_z << "," << 
+							spatula_vx << "," << spatula_vy << "," << spatula_vz << "," << spatula_vx - mean_sphere_vx
+							<< "," << spatula_vy - mean_sphere_vy << "," << spatula_vz - mean_sphere_vz << "";
 					}				
 					else break;
 				}
-				else if(spatula_vz < atof(argv[7]))
+				else if(spatula_vz < atof(argv[7])  && (fabs(mean_sphere_vx) > 0.0004 || fabs(mean_sphere_vy) > 0.0004 || fabs(mean_sphere_vz) > 0.0004))
 				{		
 					isFirstThresholdHalt = true;
 					isFirstDataWriting = true;
@@ -583,7 +585,7 @@ int main (int argc, char** argv)
 		
 			}
 			else if(spatula_vz > atof(argv[7]))		
-				isFirstThresholdPass = true;*/
+				isFirstThresholdPass = true;
 
 			prev_spatula_x = spatula_x;
 			prev_spatula_y = spatula_y;
